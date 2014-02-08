@@ -2,12 +2,14 @@ Docker fish completion
 ======================
 docker command completion for the fish shell.
 
-fish is awesome, docker is too.
+- fish = awesome
+- docker = awesome
+- completion = awesome²
 
 Installation
 ------------
     mkdir ~/.config/fish/completions
-    cp docker.fish ~/.config/fish/completions
+    wget https://raw.github.com/barnybug/docker-fish-completion/master/docker.fish -O ~/.config/fish/completions/docker.fish
 
 fish will show up the new completions straight away, no reload necessary.
     
@@ -24,8 +26,8 @@ Example
     % docker run -t -i busybox:latest
     / #
 
-Completions
------------
+Completion supported
+--------------------
 - parameters
 - commands
 - containers
