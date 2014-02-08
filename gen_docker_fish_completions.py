@@ -133,25 +133,27 @@ end
                 print '''complete -c docker -A -f -n '__fish_seen_subcommand_from {0}' {1}'''.format(sub.command, switch.fish_completion)
 
             # standalone arguments
+            unique = set()
             for args in sub.args:
                 m = re.match(r'\[(.+)\.\.\.\]', args)
                 if m:
                     # optional arguments
                     args = m.group(1)
-                args = args.split('|')
-                for arg in args:
-                    if arg == 'CONTAINER' or arg == '[CONTAINER...]':
-                        if sub.command in ('start', 'rm'):
-                            select = 'stopped'
-                        elif sub.command in ('diff',):
-                            select = 'all'
-                        else:
-                            select = 'running'
-                        print '''complete -c docker -A -f -n '__fish_seen_subcommand_from {0}' -a '(__fish_print_docker_containers {1})' -d "Container"'''.format(sub.command, select)
-                    elif arg == 'IMAGE':
-                        print '''complete -c docker -A -f -n '__fish_seen_subcommand_from {0}' -a '(__fish_print_docker_images)' -d "Image"'''.format(sub.command)
-                    elif arg == 'REPOSITORY':
-                        print '''complete -c docker -A -f -n '__fish_seen_subcommand_from {0}' -a '(__fish_print_docker_repositories)' -d "Repository"'''.format(sub.command)
+                unique.update(args.split('|'))
+
+            for arg in unique:
+                if arg == 'CONTAINER' or arg == '[CONTAINER...]':
+                    if sub.command in ('start', 'rm'):
+                        select = 'stopped'
+                    elif sub.command in ('commit', 'diff', 'export'):
+                        select = 'all'
+                    else:
+                        select = 'running'
+                    print '''complete -c docker -A -f -n '__fish_seen_subcommand_from {0}' -a '(__fish_print_docker_containers {1})' -d "Container"'''.format(sub.command, select)
+                elif arg == 'IMAGE':
+                    print '''complete -c docker -A -f -n '__fish_seen_subcommand_from {0}' -a '(__fish_print_docker_images)' -d "Image"'''.format(sub.command)
+                elif arg == 'REPOSITORY':
+                    print '''complete -c docker -A -f -n '__fish_seen_subcommand_from {0}' -a '(__fish_print_docker_repositories)' -d "Repository"'''.format(sub.command)
             print
 
         print
