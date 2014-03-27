@@ -254,3 +254,4 @@ complete -c docker -f -n '__fish_docker_no_subcommand' -a version -d 'Show the d
 complete -c docker -f -n '__fish_docker_no_subcommand' -a wait -d 'Block until a container stops, then print its exit code'
 complete -c docker -A -f -n '__fish_seen_subcommand_from wait' -a '(__fish_print_docker_containers running)' -d "Container"
 
+

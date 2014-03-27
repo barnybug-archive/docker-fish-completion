@@ -158,7 +158,7 @@ end
                 if arg == 'CONTAINER' or arg == '[CONTAINER...]':
                     if sub.command in ('start', 'rm'):
                         select = 'stopped'
-                    elif sub.command in ('commit', 'diff', 'export'):
+                    elif sub.command in ('commit', 'diff', 'export', 'inspect'):
                         select = 'all'
                     else:
                         select = 'running'
