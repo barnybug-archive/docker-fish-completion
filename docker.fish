@@ -16,7 +16,7 @@
 
 function __fish_docker_no_subcommand --description 'Test if docker has yet to be given the subcommand'
     for i in (commandline -opc)
-        if contains -- $i attach build commit cp diff events export history images import info insert inspect kill load login logs port ps pull push restart rm rmi run save search start stop tag top version wait
+        if contains -- $i attach build commit cp diff events exec export history images import info insert inspect kill load login logs port ps pull push restart rm rmi run save search start stop tag top version wait
             return 1
         end
     end
@@ -94,6 +94,13 @@ complete -c docker -A -f -n '__fish_seen_subcommand_from diff' -a '(__fish_print
 # events
 complete -c docker -f -n '__fish_docker_no_subcommand' -a events -d 'Get real time events from the server'
 complete -c docker -A -f -n '__fish_seen_subcommand_from events' -l since -d 'Show previously created events and then stream.'
+
+# exec
+complete -c docker -f -n '__fish_docker_no_subcommand' -a exec -d 'Run a command in an existing container'
+complete -c docker -A -f -n '__fish_seen_subcommand_from exec' -s d -l detach -d 'Detached mode: run command in the background'
+complete -c docker -A -f -n '__fish_seen_subcommand_from exec' -s i -l interactive -d 'Keep STDIN open even if not attached'
+complete -c docker -A -f -n '__fish_seen_subcommand_from exec' -s t -l tty -d 'Allocate a pseudo-TTY'
+complete -c docker -A -f -n '__fish_seen_subcommand_from exec' -a '(__fish_print_docker_containers running)' -d "Container"
 
 # export
 complete -c docker -f -n '__fish_docker_no_subcommand' -a export -d 'Stream the contents of a container as a tar archive'
