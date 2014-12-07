@@ -31,7 +31,11 @@ class DockerCmdLine(object):
         return iter(out.splitlines())
 
     def parse_switch(self, line):
-        opt, description = line.strip().split(': ', 1)
+        line = line.strip()
+        if '  ' not in line:
+            # ignore continuation lines
+            return None
+        opt, description = re.split('  +', line, 1)
         switches, default = opt.split('=')
         switches = switches.split(', ')
         shorts = [x[1:] for x in switches if not x.startswith('--')]
@@ -40,9 +44,16 @@ class DockerCmdLine(object):
 
     def common_options(self):
         lines = self.get_output('-h')
-        next(lines)
+        # skip header
+        while next(lines) != 'Options:':
+            pass
+
         for line in lines:
-            yield self.parse_switch(line)
+            if line == 'Commands:':
+                break
+            switch = self.parse_switch(line)
+            if switch:
+                yield switch
 
     def subcommands(self):
         lines = self.get_output('help')
