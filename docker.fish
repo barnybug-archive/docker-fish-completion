@@ -16,7 +16,7 @@
 
 function __fish_docker_no_subcommand --description 'Test if docker has yet to be given the subcommand'
     for i in (commandline -opc)
-        if contains -- $i attach build commit cp create diff events exec export history images import info insert inspect kill load login logout logs pause port ps pull push restart rm rmi run save search start stop tag top unpause version wait
+        if contains -- $i attach build commit cp create diff events exec export history images import info inspect kill load login logout logs pause port ps pull push rename restart rm rmi run save search start stats stop tag top unpause version wait
             return 1
         end
     end
@@ -218,8 +218,8 @@ complete -c docker -f -n '__fish_docker_no_subcommand' -a info -d 'Display syste
 complete -c docker -f -n '__fish_docker_no_subcommand' -a inspect -d 'Return low-level information on a container or image'
 complete -c docker -A -f -n '__fish_seen_subcommand_from inspect' -s f -l format -d 'Format the output using the given go template'
 complete -c docker -A -f -n '__fish_seen_subcommand_from inspect' -l help -d 'Print usage'
-complete -c docker -A -f -n '__fish_seen_subcommand_from inspect' -a '(__fish_print_docker_images)' -d "Image"
 complete -c docker -A -f -n '__fish_seen_subcommand_from inspect' -a '(__fish_print_docker_containers all)' -d "Container"
+complete -c docker -A -f -n '__fish_seen_subcommand_from inspect' -a '(__fish_print_docker_images)' -d "Image"
 
 # kill
 complete -c docker -f -n '__fish_docker_no_subcommand' -a kill -d 'Kill a running container'
