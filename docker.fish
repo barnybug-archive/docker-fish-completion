@@ -16,7 +16,7 @@
 
 function __fish_docker_no_subcommand --description 'Test if docker has yet to be given the subcommand'
     for i in (commandline -opc)
-        if contains -- $i attach build commit cp create diff events exec export history images import info insert inspect kill load login logs pause port ps pull push restart rm rmi run save search start stop tag top unpause version wait
+        if contains -- $i attach build commit cp create diff events exec export history images import info insert inspect kill load login logout logs pause port ps pull push restart rm rmi run save search start stop tag top unpause version wait
             return 1
         end
     end
@@ -43,7 +43,7 @@ function __fish_print_docker_repositories --description 'Print a list of docker 
 end
 
 # common options
-complete -c docker -f -n '__fish_docker_no_subcommand' -l api-enable-cors -d 'Enable CORS headers in the remote API'
+complete -c docker -f -n '__fish_docker_no_subcommand' -l api-cors-header -d 'Set CORS headers in the remote API'
 complete -c docker -f -n '__fish_docker_no_subcommand' -s b -l bridge -d 'Attach containers to a pre-existing network bridge'
 complete -c docker -f -n '__fish_docker_no_subcommand' -l bip -d "Use this CIDR notation address for the network bridge's IP, not compatible with -b"
 complete -c docker -f -n '__fish_docker_no_subcommand' -s D -l debug -d 'Enable debug mode'
@@ -52,6 +52,7 @@ complete -c docker -f -n '__fish_docker_no_subcommand' -l dns -d 'Force Docker t
 complete -c docker -f -n '__fish_docker_no_subcommand' -l dns-search -d 'Force Docker to use specific DNS search domains'
 complete -c docker -f -n '__fish_docker_no_subcommand' -s e -l exec-driver -d 'Force the Docker runtime to use a specific exec driver'
 complete -c docker -f -n '__fish_docker_no_subcommand' -l fixed-cidr -d 'IPv4 subnet for fixed IPs (ex: 10.20.0.0/16)'
+complete -c docker -f -n '__fish_docker_no_subcommand' -l fixed-cidr-v6 -d 'IPv6 subnet for fixed IPs'
 complete -c docker -f -n '__fish_docker_no_subcommand' -s G -l group -d 'Group to assign the unix socket specified by -H when running in daemon mode'
 complete -c docker -f -n '__fish_docker_no_subcommand' -s g -l graph -d 'Path to use as the root of the Docker runtime'
 complete -c docker -f -n '__fish_docker_no_subcommand' -s H -l host -d 'The socket(s) to bind to in daemon mode or connect to in client mode, specified using one or more tcp://host:port, unix:///path/to/socket, fd://* or fd://socketfd.'
@@ -61,6 +62,10 @@ complete -c docker -f -n '__fish_docker_no_subcommand' -l ip -d 'Default IP addr
 complete -c docker -f -n '__fish_docker_no_subcommand' -l ip-forward -d 'Enable net.ipv4.ip_forward'
 complete -c docker -f -n '__fish_docker_no_subcommand' -l ip-masq -d "Enable IP masquerading for bridge's IP range"
 complete -c docker -f -n '__fish_docker_no_subcommand' -l iptables -d "Enable Docker's addition of iptables rules"
+complete -c docker -f -n '__fish_docker_no_subcommand' -l ipv6 -d "Enable IPv6 networking"
+complete -c docker -f -n '__fish_docker_no_subcommand' -s l -l log-level -d 'Set the logging level'
+complete -c docker -f -n '__fish_docker_no_subcommand' -l label -d 'Set key=value labels to the daemon'
+complete -c docker -f -n '__fish_docker_no_subcommand' -l log-driver -d 'Container''s logging driver (json-file/none)'
 complete -c docker -f -n '__fish_docker_no_subcommand' -l mtu -d 'Set the containers network MTU'
 complete -c docker -f -n '__fish_docker_no_subcommand' -s p -l pidfile -d 'Path to use for daemon PID file'
 complete -c docker -f -n '__fish_docker_no_subcommand' -l registry-mirror -d 'Specify a preferred Docker registry mirror'
@@ -73,6 +78,7 @@ complete -c docker -f -n '__fish_docker_no_subcommand' -l tlscert -d 'Path to TL
 complete -c docker -f -n '__fish_docker_no_subcommand' -l tlskey -d 'Path to TLS key file'
 complete -c docker -f -n '__fish_docker_no_subcommand' -l tlsverify -d 'Use TLS and verify the remote (daemon: verify client, client: verify daemon)'
 complete -c docker -f -n '__fish_docker_no_subcommand' -s v -l version -d 'Print version information and quit'
+complete -c docker -f -n '__fish_docker_no_subcommand' -l default-ulimit -d 'Set default ulimit settings for containers'
 
 # subcommands
 # attach
@@ -83,15 +89,22 @@ complete -c docker -A -f -n '__fish_seen_subcommand_from attach' -a '(__fish_pri
 
 # build
 complete -c docker -f -n '__fish_docker_no_subcommand' -a build -d 'Build an image from a Dockerfile'
+complete -c docker -A -f -n '__fish_seen_subcommand_from build' -s f -l file -d 'Name of the Dockerfile (Default is ''PATH/Dockerfile'')'
 complete -c docker -A -f -n '__fish_seen_subcommand_from build' -l force-rm -d 'Always remove intermediate containers, even after unsuccessful builds'
 complete -c docker -A -f -n '__fish_seen_subcommand_from build' -l no-cache -d 'Do not use cache when building the image'
+complete -c docker -A -f -n '__fish_seen_subcommand_from build' -l pull -d 'Always attempt to pull a newer version of the image'
 complete -c docker -A -f -n '__fish_seen_subcommand_from build' -s q -l quiet -d 'Suppress the verbose output generated by the containers'
 complete -c docker -A -f -n '__fish_seen_subcommand_from build' -l rm -d 'Remove intermediate containers after a successful build'
 complete -c docker -A -f -n '__fish_seen_subcommand_from build' -s t -l tag -d 'Repository name (and optionally a tag) to be applied to the resulting image in case of success'
+complete -c docker -A -f -n '__fish_seen_subcommand_from build' -s m -l memory -d 'Memory limit for all build containers'
+complete -c docker -A -f -n '__fish_seen_subcommand_from build' -l memory-swap -d 'Total memory (memory + swap), `-1` to disable swap'
+complete -c docker -A -f -n '__fish_seen_subcommand_from build' -s c -l cpu-shares -d 'CPU Shares (relative weight)'
+complete -c docker -A -f -n '__fish_seen_subcommand_from build' -l cpuset-cpus -d 'CPUs in which to allow exection, e.g. `0-3`, `0,1`'
 
 # commit
 complete -c docker -f -n '__fish_docker_no_subcommand' -a commit -d "Create a new image from a container's changes"
 complete -c docker -A -f -n '__fish_seen_subcommand_from commit' -s a -l author -d 'Author (e.g., "John Hannibal Smith <hannibal@a-team.com>")'
+complete -c docker -A -f -n '__fish_seen_subcommand_from commit' -s c -l change -d 'Apply specified Dockerfile instructions while committing the image'
 complete -c docker -A -f -n '__fish_seen_subcommand_from commit' -s m -l message -d 'Commit message'
 complete -c docker -A -f -n '__fish_seen_subcommand_from commit' -s p -l pause -d 'Pause container during commit'
 complete -c docker -A -f -n '__fish_seen_subcommand_from commit' -a '(__fish_print_docker_containers all)' -d "Container"
@@ -106,8 +119,9 @@ complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l add-host -d 
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -s c -l cpu-shares -d 'CPU shares (relative weight)'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l cap-add -d 'Add Linux capabilities'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l cap-drop -d 'Drop Linux capabilities'
+complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l cgroup-parent -d 'Optional parent cgroup for the container'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l cidfile -d 'Write the container ID to the file'
-complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l cpuset -d 'CPUs in which to allow execution (0-3, 0,1)'
+complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l cpuset-cpus -d 'CPUs in which to allow execution (0-3, 0,1)'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l device -d 'Add a host device to the container (e.g. --device=/dev/sdc:/dev/xvdc)'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l dns -d 'Set custom DNS servers'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l dns-search -d 'Set custom DNS search domains'
@@ -117,14 +131,20 @@ complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l env-file -d 
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l expose -d 'Expose a port from the container without publishing it to your host'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -s h -l hostname -d 'Container host name'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -s i -l interactive -d 'Keep STDIN open even if not attached'
+complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l ipc -d 'IPC namespace to use'
+complete -c docker -A -f -n '__fish_seen_subcommand_from create' -s l -l label -d 'Set metadata on the container (e.g., --label=com.example.key=value)'
+complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l label-file -d 'Read in a line delimited file of labels'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l link -d 'Add link to another container in the form of name:alias'
+complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l log-driver -d 'Logging driver for container'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l lxc-conf -d '(lxc exec-driver only) Add custom lxc options --lxc-conf="lxc.cgroup.cpuset.cpus = 0,1"'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -s m -l memory -d 'Memory limit (format: <number><optional unit>, where unit = b, k, m or g)'
+complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l mac-address -d 'Container MAC address (e.g. 92:d0:c6:0a:29:33)'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l name -d 'Assign a name to the container'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l net -d 'Set the Network mode for the container'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -s P -l publish-all -d 'Publish all exposed ports to the host interfaces'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -s p -l publish -d "Publish a container's port to the host"
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l privileged -d 'Give extended privileges to this container'
+complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l read-only -d 'Mount the container''s root filesystem as read only'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l restart -d 'Restart policy to apply when a container exits (no, on-failure[:max-retry], always)'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l security-opt -d 'Security Options'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -s t -l tty -d 'Allocate a pseudo-TTY'
@@ -140,6 +160,7 @@ complete -c docker -A -f -n '__fish_seen_subcommand_from diff' -a '(__fish_print
 
 # events
 complete -c docker -f -n '__fish_docker_no_subcommand' -a events -d 'Get real time events from the server'
+complete -c docker -A -f -n '__fish_seen_subcommand_from events' -s f -l filter -d 'Filter output based on conditions provided'
 complete -c docker -A -f -n '__fish_seen_subcommand_from events' -l since -d 'Show all events created since timestamp'
 complete -c docker -A -f -n '__fish_seen_subcommand_from events' -l until -d 'Stream events until this timestamp'
 
@@ -163,6 +184,7 @@ complete -c docker -A -f -n '__fish_seen_subcommand_from history' -a '(__fish_pr
 # images
 complete -c docker -f -n '__fish_docker_no_subcommand' -a images -d 'List images'
 complete -c docker -A -f -n '__fish_seen_subcommand_from images' -s a -l all -d 'Show all images (by default filter out the intermediate image layers)'
+complete -c docker -A -f -n '__fish_seen_subcommand_from images' -l digests -d 'Show digests'
 complete -c docker -A -f -n '__fish_seen_subcommand_from images' -s f -l filter -d "Provide filter values (i.e. 'dangling=true')"
 complete -c docker -A -f -n '__fish_seen_subcommand_from images' -l no-trunc -d "Don't truncate output"
 complete -c docker -A -f -n '__fish_seen_subcommand_from images' -s q -l quiet -d 'Only show numeric IDs'
@@ -170,6 +192,7 @@ complete -c docker -A -f -n '__fish_seen_subcommand_from images' -a '(__fish_pri
 
 # import
 complete -c docker -f -n '__fish_docker_no_subcommand' -a import -d 'Create a new filesystem image from the contents of a tarball'
+complete -c docker -A -f -n '__fish_seen_subcommand_from import' -s c -l change -d 'Apply specified Dockerfile instructions while importing the image'
 
 # info
 complete -c docker -f -n '__fish_docker_no_subcommand' -a info -d 'Display system-wide information'
@@ -205,13 +228,13 @@ complete -c docker -A -f -n '__fish_seen_subcommand_from logs' -s t -l timestamp
 complete -c docker -A -f -n '__fish_seen_subcommand_from logs' -l tail -d 'Output the specified number of lines at the end of logs (defaults to all logs)'
 complete -c docker -A -f -n '__fish_seen_subcommand_from logs' -a '(__fish_print_docker_containers running)' -d "Container"
 
-# port
-complete -c docker -f -n '__fish_docker_no_subcommand' -a port -d 'Lookup the public-facing port that is NAT-ed to PRIVATE_PORT'
-complete -c docker -A -f -n '__fish_seen_subcommand_from port' -a '(__fish_print_docker_containers running)' -d "Container"
-
 # pause
 complete -c docker -f -n '__fish_docker_no_subcommand' -a pause -d 'Pause all processes within a container'
 complete -c docker -A -f -n '__fish_seen_subcommand_from pause' -a '(__fish_print_docker_containers running)' -d "Container"
+
+# port
+complete -c docker -f -n '__fish_docker_no_subcommand' -a port -d 'Lookup the public-facing port that is NAT-ed to PRIVATE_PORT'
+complete -c docker -A -f -n '__fish_seen_subcommand_from port' -a '(__fish_print_docker_containers running)' -d "Container"
 
 # ps
 complete -c docker -f -n '__fish_docker_no_subcommand' -a ps -d 'List containers'
@@ -235,6 +258,9 @@ complete -c docker -A -f -n '__fish_seen_subcommand_from pull' -a '(__fish_print
 complete -c docker -f -n '__fish_docker_no_subcommand' -a push -d 'Push an image or a repository to a Docker registry server'
 complete -c docker -A -f -n '__fish_seen_subcommand_from push' -a '(__fish_print_docker_images)' -d "Image"
 complete -c docker -A -f -n '__fish_seen_subcommand_from push' -a '(__fish_print_docker_repositories)' -d "Repository"
+
+# rename
+complete -c docker -f -n '__fish_docker_no_subcommand' -a rename -d 'Rename a existing container to a NEW_NAME'
 
 # restart
 complete -c docker -f -n '__fish_docker_no_subcommand' -a restart -d 'Restart a running container'
@@ -262,7 +288,7 @@ complete -c docker -A -f -n '__fish_seen_subcommand_from run' -s c -l cpu-shares
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l cap-add -d 'Add Linux capabilities'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l cap-drop -d 'Drop Linux capabilities'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l cidfile -d 'Write the container ID to the file'
-complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l cpuset -d 'CPUs in which to allow execution (0-3, 0,1)'
+complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l cpuset-cpus -d 'CPUs in which to allow execution (0-3, 0,1)'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -s d -l detach -d 'Detached mode: run the container in the background and print the new container ID'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l device -d 'Add a host device to the container (e.g. --device=/dev/sdc:/dev/xvdc)'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l dns -d 'Set custom DNS servers'
@@ -273,14 +299,22 @@ complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l env-file -d 'Re
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l expose -d 'Expose a port from the container without publishing it to your host'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -s h -l hostname -d 'Container host name'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -s i -l interactive -d 'Keep STDIN open even if not attached'
+complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l ipc -d 'IPC namespace to use'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l link -d 'Add link to another container in the form of name:alias'
+complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l log-driver -d 'Logging driver for container'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l lxc-conf -d '(lxc exec-driver only) Add custom lxc options --lxc-conf="lxc.cgroup.cpuset.cpus = 0,1"'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -s m -l memory -d 'Memory limit (format: <number><optional unit>, where unit = b, k, m or g)'
+complete -c docker -A -f -n '__fish_seen_subcommand_from run' -s l -l label -d 'Set metadata on the container (e.g., --label=com.example.key=value)'
+complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l label-file -d 'Read in a file of labels (EOL delimited)'
+complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l mac-address -d 'Container MAC address (e.g. 92:d0:c6:0a:29:33)'
+complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l memory-swap -d 'Total memory (memory + swap), '-1' to disable swap'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l name -d 'Assign a name to the container'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l net -d 'Set the Network mode for the container'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -s P -l publish-all -d 'Publish all exposed ports to the host interfaces'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -s p -l publish -d "Publish a container's port to the host"
+complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l pid -d 'PID namespace to use'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l privileged -d 'Give extended privileges to this container'
+complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l read-only -d 'Mount the container''s root filesystem as read only'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l restart -d 'Restart policy to apply when a container exits (no, on-failure[:max-retry], always)'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l rm -d 'Automatically remove the container when it exits (incompatible with -d)'
 complete -c docker -A -f -n '__fish_seen_subcommand_from run' -l security-opt -d 'Security Options'
@@ -308,6 +342,9 @@ complete -c docker -f -n '__fish_docker_no_subcommand' -a start -d 'Start a stop
 complete -c docker -A -f -n '__fish_seen_subcommand_from start' -s a -l attach -d "Attach container's STDOUT and STDERR and forward all signals to the process"
 complete -c docker -A -f -n '__fish_seen_subcommand_from start' -s i -l interactive -d "Attach container's STDIN"
 complete -c docker -A -f -n '__fish_seen_subcommand_from start' -a '(__fish_print_docker_containers stopped)' -d "Container"
+
+# stats
+complete -c docker -f -n '__fish_docker_no_subcommand' -a stats -d 'Display a live stream of one or more containers'' resource usage statistics'
 
 # stop
 complete -c docker -f -n '__fish_docker_no_subcommand' -a stop -d 'Stop a running container'
