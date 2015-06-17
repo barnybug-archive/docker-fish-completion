@@ -135,7 +135,7 @@ function __fish_print_docker_containers --description 'Print a list of docker co
 end
 
 function __fish_print_docker_images --description 'Print a list of docker images'
-    docker images | command awk 'NR>1' | command grep -v '<none>' | command awk '{print $1":"$2}'
+    docker images | command awk 'NR>1' | command awk '{print $1":"$2"~"$3}' | command sed 's/^<none>:<none>~\\(.*\\)$/\\1\\tUnnamed Image/; s/~.*$//'
 end
 
 function __fish_print_docker_repositories --description 'Print a list of docker repositories'
