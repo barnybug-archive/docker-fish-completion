@@ -11,7 +11,7 @@ Installation
     mkdir ~/.config/fish/completions
     wget https://raw.github.com/barnybug/docker-fish-completion/master/docker.fish -O ~/.config/fish/completions/docker.fish
 
-### Fisherman
+### [Fisherman](https://github.com/fisherman/fisherman)
 
     fisher install barnybug/docker-fish-completion
 
