@@ -11,6 +11,10 @@ Installation
     mkdir ~/.config/fish/completions
     wget https://raw.github.com/barnybug/docker-fish-completion/master/docker.fish -O ~/.config/fish/completions/docker.fish
 
+### Fisherman
+
+    fisher install barnybug/docker-fish-completion
+
 fish will show up the new completions straight away, no reload necessary.
     
 Example
