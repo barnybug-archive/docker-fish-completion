@@ -20,10 +20,17 @@ class Switch(object):
         self.description = description
         self.metavar = metavar
 
+    def is_file_target(self):
+        if not self.metavar:
+            return False
+        return self.metavar == 'FILE' or 'PATH' in self.metavar
+
     @property
     def fish_completion(self):
         complete_arg_spec = ['-s %s' % x for x in self.shorts]
         complete_arg_spec += ['-l %s' % x for x in self.longs]
+        if not self.is_file_target():
+            complete_arg_spec.append('-f')
         desc = repr(self.description)
         return '''{0} -d {1}'''.format(' '.join(complete_arg_spec), desc)
 
@@ -38,7 +45,7 @@ class DockerCmdLine(object):
         cmd = [os.path.join(self.docker_path, self.binary)] + list(args)
         # docker returns non-zero exit code for some help commands so can't use subprocess.check_output here
         ps = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        out, err = ps.communicate()
+        out, _ = ps.communicate()
         out = out.decode('utf-8')
         return iter(out.splitlines())
 
@@ -134,7 +141,7 @@ class BaseFishGenerator(object):
     def common_options(self):
         print('# common options')
         for switch in self.docker.common_options():
-            print('''complete -c {binary} -f -n '__fish_docker_no_subcommand' {completion}'''.format(
+            print('''complete -c {binary} -n '__fish_docker_no_subcommand' {completion}'''.format(
                 binary=self.docker.binary,
                 completion=switch.fish_completion))
         print()
@@ -149,7 +156,7 @@ class BaseFishGenerator(object):
                 command=sub.command,
                 desc=desc))
             for switch in sub.switches:
-                print('''complete -c {binary} -A -f -n '__fish_seen_subcommand_from {command}' {completion}'''.format(
+                print('''complete -c {binary} -A -n '__fish_seen_subcommand_from {command}' {completion}'''.format(
                     binary=self.docker.binary,
                     command=sub.command,
                     completion=switch.fish_completion))
