@@ -43,8 +43,9 @@ class DockerCmdLine(object):
             # ignore continuation lines
             return None
         opt, description = re.split('  +', line, 1)
-        switches, default = opt.split('=')
-        switches = switches.split(', ')
+        if '=' in opt:
+            opt = opt[:opt.find('=')]
+        switches = opt.split(', ')
         shorts = [x[1:] for x in switches if not x.startswith('--')]
         longs = [x[2:] for x in switches if x.startswith('--')]
         return Switch(shorts, longs, description)
