@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-
 import subprocess
 import re
+import os
+from argparse import ArgumentParser
+
 
 class Subcommand(object):
     def __init__(self, command, description, args, switches):
@@ -24,9 +26,13 @@ class Switch(object):
         return '''{0} -d {1}'''.format(' '.join(complete_arg_spec), desc)
 
 class DockerCmdLine(object):
+    def __init__(self, docker_path):
+        self.docker_path = docker_path
+
     def get_output(self, *args):
+        cmd = [os.path.join(self.docker_path, 'docker')] + list(args)
         # docker returns non-zero exit code for some help commands so can't use subprocess.check_output here
-        ps = subprocess.Popen(['/usr/bin/docker'] + list(args), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        ps = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         out, _ = ps.communicate()
         out = out.decode('utf-8')
         return iter(out.splitlines())
@@ -185,9 +191,19 @@ end
         print()
 
 
+def main():
+    parser = ArgumentParser()
+    parser.add_argument(
+        '--docker-path',
+        default='/usr/bin'
+    )
+
+    args = parser.parse_args()
+
+    FishGenerator(DockerCmdLine(args.docker_path)).generate()
 
 if __name__ == '__main__':
-    FishGenerator(DockerCmdLine()).generate()
+    main()
 
 # complete -f -n '__fish_docker_no_subcommand' -c docker -a 'attach' --description "Attach to a running container"
 # complete -f -n '__fish_seen_subcommand_from attach' -c docker -l no-stdin --description "Do not attach stdin"
