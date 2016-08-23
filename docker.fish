@@ -30,12 +30,12 @@ function __fish_print_docker_containers --description 'Print a list of docker co
         case stopped
             docker ps --no-trunc --filter status=exited --format '{{.ID}}\n{{.Names}}' | tr ',' '\n'
         case all
-            docker ps --no-trunc --format '{{.ID}}\n{{.Names}}' | tr ',' '\n'
+            docker ps --no-trunc --all --format '{{.ID}}\n{{.Names}}' | tr ',' '\n'
     end
 end
 
 function __fish_print_docker_images --description 'Print a list of docker images'
-    docker images -a --format '{{if eq .Repository "<none>"}}{{.ID}}\tUnnamed Image{{else}}{{.Repository}}:{{.Tag}}{{end}}'
+    docker images --format '{{if eq .Repository "<none>"}}{{.ID}}\tUnnamed Image{{else}}{{.Repository}}:{{.Tag}}{{end}}'
 end
 
 function __fish_print_docker_repositories --description 'Print a list of docker repositories'
