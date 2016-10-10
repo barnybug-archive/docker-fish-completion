@@ -273,7 +273,7 @@ complete -c docker -A -n '__fish_seen_subcommand_from logs' -l help -f -d 'Print
 complete -c docker -A -n '__fish_seen_subcommand_from logs' -l since -f -d 'Show logs since timestamp'
 complete -c docker -A -n '__fish_seen_subcommand_from logs' -s t -l timestamps -f -d 'Show timestamps'
 complete -c docker -A -n '__fish_seen_subcommand_from logs' -l tail=all -f -d 'Number of lines to show from the end of the logs'
-complete -c docker -A -f -n '__fish_seen_subcommand_from logs' -a '(__fish_print_docker_containers running)' -d "Container"
+complete -c docker -A -f -n '__fish_seen_subcommand_from logs' -a '(__fish_print_docker_containers all)' -d "Container"
 
 # network
 complete -c docker -f -n '__fish_docker_no_subcommand' -a network -d 'Manage Docker networks'
