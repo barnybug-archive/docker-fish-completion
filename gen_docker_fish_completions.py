@@ -210,7 +210,7 @@ function __fish_print_docker_containers --description 'Print a list of docker co
         case running
             docker ps --no-trunc --filter status=running --format '{{.ID}}\\n{{.Names}}' | tr ',' '\\n'
         case stopped
-            docker ps --no-trunc --filter status=exited --format '{{.ID}}\\n{{.Names}}' | tr ',' '\\n'
+            docker ps --no-trunc --filter status=exited --filter status=created --format '{{.ID}}\\n{{.Names}}' | tr ',' '\\n'
         case all
             docker ps --no-trunc --all --format '{{.ID}}\\n{{.Names}}' | tr ',' '\\n'
     end
