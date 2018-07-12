@@ -324,7 +324,7 @@ complete -c docker -A -n '__fish_seen_subcommand_from rename' -l help -f -d 'Pri
 complete -c docker -f -n '__fish_docker_no_subcommand' -a restart -d 'Restart a container'
 complete -c docker -A -n '__fish_seen_subcommand_from restart' -l help -f -d 'Print usage'
 complete -c docker -A -n '__fish_seen_subcommand_from restart' -s t -l time=10 -f -d 'Seconds to wait for stop before killing the container'
-complete -c docker -A -f -n '__fish_seen_subcommand_from restart' -a '(__fish_print_docker_containers running)' -d "Container"
+complete -c docker -A -f -n '__fish_seen_subcommand_from restart' -a '(__fish_print_docker_containers all)' -d "Container"
 
 # rm
 complete -c docker -f -n '__fish_docker_no_subcommand' -a rm -d 'Remove one or more containers'
