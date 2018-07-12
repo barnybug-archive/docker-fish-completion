@@ -35,11 +35,11 @@ function __fish_print_docker_containers --description 'Print a list of docker co
 end
 
 function __fish_print_docker_images --description 'Print a list of docker images'
-    docker images --format '{{if eq .Repository "<none>"}}{{.ID}}\tUnnamed Image{{else}}{{.Repository}}:{{.Tag}}{{end}}'
+    docker images --format '{{.Repository}}:{{.Tag}}' -f 'dangling=false' | command sort | command uniq
 end
 
 function __fish_print_docker_repositories --description 'Print a list of docker repositories'
-    docker images --format '{{.Repository}}' | command grep -v '<none>' | command sort | command uniq
+    docker images --format '{{.Repository}}' -f 'dangling=false' | command sort | command uniq
 end
 
 # common options
