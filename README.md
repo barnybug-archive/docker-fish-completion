@@ -13,7 +13,7 @@ Installation
 
 ### [Fisherman](https://github.com/fisherman/fisherman)
 
-    fisher install barnybug/docker-fish-completion
+    fisher add github.com/barnybug/docker-fish-completion
 
 fish will show up the new completions straight away, no reload necessary.
     
